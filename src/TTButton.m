@@ -417,6 +417,12 @@ static const CGFloat kVPadding = 7;
   [self setNeedsDisplay];
 }
 
+- (void)setRawImage:(UIImage*)image forState:(UIControlState)state {
+	TTButtonContent *content = [self contentForState:state];
+	content.image = image;
+	[self setNeedsDisplay];
+}
+
 - (TTStyle*)styleForState:(UIControlState)state {
   return [self contentForState:state].style;
 }

@@ -34,6 +34,8 @@
 - (NSString*)imageForState:(UIControlState)state;
 - (void)setImage:(NSString*)title forState:(UIControlState)state;
 
+- (void)setRawImage:(UIImage*)image forState:(UIControlState)state;
+
 - (TTStyle*)styleForState:(UIControlState)state;
 - (void)setStyle:(TTStyle*)style forState:(UIControlState)state;
 

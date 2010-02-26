@@ -415,7 +415,7 @@ static const CGFloat kDesiredTableHeight = 150;
 - (void)setSearchesAutomatically:(BOOL)searchesAutomatically {
   _searchesAutomatically = searchesAutomatically;
   if (searchesAutomatically) {
-    self.returnKeyType = UIReturnKeyDone;
+    self.returnKeyType = UIReturnKeySearch;
     self.enablesReturnKeyAutomatically = NO;
   } else {
     self.returnKeyType = UIReturnKeySearch;

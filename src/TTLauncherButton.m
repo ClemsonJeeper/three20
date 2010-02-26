@@ -69,7 +69,11 @@ static const NSInteger kMaxBadgeNumber = 99;
     
     NSString* title =  [[NSBundle mainBundle] localizedStringForKey:item.title value:nil table:nil];
     [self setTitle:title forState:UIControlStateNormal];
-    [self setImage:item.image forState:UIControlStateNormal];
+	  if (item.rawImage) {
+		  [self setRawImage:item.rawImage forState:UIControlStateNormal];
+	  } else {
+		  [self setImage:item.image forState:UIControlStateNormal];
+	  }
 
     if (item.style) {
       [self setStylesWithSelector:item.style];

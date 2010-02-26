@@ -311,7 +311,7 @@ static const CGFloat kDefaultMessageImageHeight = 34;
                                   constrainedToSize:CGSizeMake(width, CGFLOAT_MAX)
                                   lineBreakMode:UILineBreakModeWordWrap];
   
-  return kVPadding*2 + detailTextSize.height + textSize.height;
+  return kVPadding*2 + detailTextSize.height + textSize.height + 15;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

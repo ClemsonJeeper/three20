@@ -32,7 +32,8 @@ static const NSTimeInterval kPauseInterval = 0.4;
 @implementation TTSearchDisplayController
 
 @synthesize searchResultsViewController = _searchResultsViewController,
-            pausesBeforeSearching = _pausesBeforeSearching;
+            pausesBeforeSearching = _pausesBeforeSearching,
+			pauseInterval = _pauseInterval;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // private
@@ -49,7 +50,7 @@ static const NSTimeInterval kPauseInterval = 0.4;
 
 - (void)restartPauseTimer {
   TT_INVALIDATE_TIMER(_pauseTimer);
-  _pauseTimer = [NSTimer scheduledTimerWithTimeInterval:kPauseInterval target:self
+  _pauseTimer = [NSTimer scheduledTimerWithTimeInterval:_pauseInterval target:self
                          selector:@selector(searchAfterPause) userInfo:nil repeats:NO];
 }
 
@@ -67,7 +68,8 @@ static const NSTimeInterval kPauseInterval = 0.4;
     _searchResultsViewController = nil;
     _pauseTimer = nil;
     _pausesBeforeSearching = NO;
-    
+	_pauseInterval = kPauseInterval;
+	  
     self.delegate = self;
   }
   return self;
@@ -160,6 +162,14 @@ static const NSTimeInterval kPauseInterval = 0.4;
   [_searchResultsViewController invalidateModel];
   [_searchResultsViewController.dataSource search:self.searchBar.text];
   return NO;
+}
+
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
+{
+	if (_pausesBeforeSearching) {
+		TT_INVALIDATE_TIMER(_pauseTimer);
+	}
+	[_searchResultsViewController.dataSource search:self.searchBar.text];
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

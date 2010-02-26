@@ -39,6 +39,7 @@
 }
 
 - (id)initWithController:(TTTableViewController*)controller;
+- (void)tableView:(UITableView*)tableView touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event;
 
 @property(nonatomic,readonly) TTTableViewController* controller;
 

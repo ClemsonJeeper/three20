@@ -23,7 +23,7 @@
 @implementation TTLauncherItem
 
 @synthesize launcher = _launcher, title = _title, image = _image, URL = _URL, style = _style,
-            badgeNumber = _badgeNumber, canDelete = _canDelete;
+            badgeNumber = _badgeNumber, canDelete = _canDelete, rawImage = _rawImage, rawData = _rawData;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // NSObject
@@ -38,6 +38,7 @@
     _launcher = nil;
     _title = nil;
     _image = nil;
+    _rawImage = nil;
     _URL = nil;
     _style = nil;
     _badgeNumber = 0;
@@ -53,6 +54,8 @@
 - (void)dealloc {
   TT_RELEASE_SAFELY(_title);
   TT_RELEASE_SAFELY(_image);
+  TT_RELEASE_SAFELY(_rawImage);
+  TT_RELEASE_SAFELY(_rawData);
   TT_RELEASE_SAFELY(_URL);
   TT_RELEASE_SAFELY(_style);
   [super dealloc];

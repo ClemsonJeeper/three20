@@ -23,15 +23,19 @@
   TTLauncherView* _launcher;
   NSString* _title;
   NSString* _image;
+	UIImage *_rawImage;
   NSString* _URL;
   NSString* _style;
   NSInteger _badgeNumber;
+	NSDictionary *_rawData;
   BOOL _canDelete;
 }
 
 @property(nonatomic,assign) TTLauncherView* launcher;
 @property(nonatomic,copy) NSString* title;
 @property(nonatomic,copy) NSString* image;
+@property(nonatomic,retain) UIImage* rawImage;
+@property(nonatomic,copy) NSDictionary* rawData;
 @property(nonatomic,copy) NSString* URL;
 @property(nonatomic,copy) NSString* style;
 @property(nonatomic) NSInteger badgeNumber;

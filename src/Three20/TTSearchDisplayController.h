@@ -35,9 +35,11 @@
   TTTableViewController* _searchResultsViewController;
   NSTimer* _pauseTimer;
   BOOL _pausesBeforeSearching;
+	float _pauseInterval;
 }
 
 @property(nonatomic,retain) TTTableViewController* searchResultsViewController;
 @property(nonatomic) BOOL pausesBeforeSearching;
+@property(nonatomic) float pauseInterval;
 
 @end
