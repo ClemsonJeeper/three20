@@ -188,6 +188,15 @@ UIViewController* TTOpenURL(NSString* URL) {
       return [self openURLAction:[TTURLAction actionWithURLPath: parentURLPath]];
     } else {
       UIViewController* parent = self.topViewController;
+		// fix issue with navigation under More... tab
+		if ([parent isKindOfClass:[UINavigationController class]]) {
+			if (parent.parentViewController != nil)
+				parent = parent.parentViewController;
+			if ([parent isKindOfClass:[UITabBarController class]]) {
+				parent = [(UITabBarController*)parent moreNavigationController];
+			}
+		} 
+
       if (parent != controller) {
         return parent;
       } else {

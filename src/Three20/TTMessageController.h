@@ -16,9 +16,10 @@
 
 #import "Three20/TTModelViewController.h"
 #import "Three20/TTTextEditor.h"
+#import "Three20/TTButton.h"
 
 @protocol TTTableViewDataSource, TTMessageControllerDelegate;
-@class TTPickerTextField, TTActivityLabel;
+@class TTPickerTextField, TTActivityLabel, TTMessageField;
 
 @interface TTMessageController : TTViewController <UITextFieldDelegate, TTTextEditorDelegate> {
   id<TTMessageControllerDelegate> _delegate;
@@ -50,6 +51,7 @@
 
 - (BOOL)fieldHasValueAtIndex:(NSUInteger)fieldIndex;
 - (UIView*)viewForFieldAtIndex:(NSUInteger)fieldIndex;
+- (TTMessageField *)fieldForFieldAtIndex:(NSUInteger)fieldIndex;
 
 - (void)showActivityView:(BOOL)show;
 
@@ -90,6 +92,8 @@
  */
 - (BOOL)messageShouldCancel;
 
+- (void)updateSendCommand;
+
 @end
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,6 +107,8 @@
 - (void)composeControllerWillCancel:(TTMessageController*)controller;
 
 - (void)composeControllerShowRecipientPicker:(TTMessageController*)controller;
+
+- (void)composeControllerShowAttachmentPicker:(TTMessageController *)controller;
 
 @end
 
@@ -137,5 +143,13 @@
 @end
 
 @interface TTMessageSubjectField : TTMessageTextField
+
+@end
+
+@interface FRAttachmentField : TTMessageField
+{
+	BOOL _uploading;
+}
+@property (nonatomic, assign) BOOL uploading;
 
 @end

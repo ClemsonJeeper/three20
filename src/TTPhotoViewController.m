@@ -248,6 +248,16 @@ static const NSInteger kActivityLabelTag = 96;
   }
 }
 
+- (void)actionAction
+{
+	UIActionSheet *actionSheet = [[[UIActionSheet alloc] initWithTitle:@"" 
+															 delegate:self 
+													cancelButtonTitle:TTLocalizedString(@"Cancel", @"")
+											   destructiveButtonTitle:nil 
+													otherButtonTitles:TTLocalizedString(@"Save to Photo Library", @""), nil] autorelease];
+	[actionSheet showInView:self.view];
+}
+
 - (void)playAction {
   if (!_slideshowTimer) {
     UIBarButtonItem* pauseButton = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:
@@ -386,7 +396,9 @@ static const NSInteger kActivityLabelTag = 96;
   _previousButton = [[UIBarButtonItem alloc] initWithImage:
     TTIMAGE(@"bundle://Three20.bundle/images/previousIcon.png")
      style:UIBarButtonItemStylePlain target:self action:@selector(previousAction)];
-
+  _actionButton = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction
+																 target:self
+																 action:@selector(actionAction)] autorelease];
   UIBarButtonItem* playButton = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:
     UIBarButtonSystemItemPlay target:self action:@selector(playAction)] autorelease];
   playButton.tag = 1;
@@ -404,7 +416,7 @@ static const NSInteger kActivityLabelTag = 96;
   _toolbar.barStyle = self.navigationBarStyle;
   _toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleTopMargin;
   _toolbar.items = [NSArray arrayWithObjects:
-                   space, _previousButton, space, _nextButton, space, nil];
+					_actionButton, space, _previousButton, space, _nextButton, space, nil];
   [_innerView addSubview:_toolbar];    
 }
 
@@ -675,6 +687,24 @@ static const NSInteger kActivityLabelTag = 96;
 - (BOOL)thumbsViewController:(TTThumbsViewController*)controller
         shouldNavigateToPhoto:(id<TTPhoto>)photo {
   return NO;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// UIActionSheetDelegate
+
+- (void) actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+	if (buttonIndex == 0) {
+		NSURL *aUrl  = [NSURL URLWithString:[_centerPhoto URLForVersion:TTPhotoVersionLarge]];
+		NSData *data = [NSData dataWithContentsOfURL:aUrl];
+		if (data) {
+			UIImage *img  = [[UIImage alloc] initWithData:data];
+			if (img) {
+				UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil);
+			}
+			TT_RELEASE_SAFELY(img);
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

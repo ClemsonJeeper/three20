@@ -120,6 +120,8 @@
 
 - (void)launcherView:(TTLauncherView*)launcher didAddItem:(TTLauncherItem*)item;
 
+- (BOOL)launcherView:(TTLauncherView*)launcher shouldRemoveItem:(TTLauncherItem*)item;
+
 - (void)launcherView:(TTLauncherView*)launcher didRemoveItem:(TTLauncherItem*)item;
 
 - (void)launcherView:(TTLauncherView*)launcher didMoveItem:(TTLauncherItem*)item;

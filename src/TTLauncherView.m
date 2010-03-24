@@ -729,6 +729,12 @@ static const NSInteger kDefaultColumnCount = 3;
 }
 
 - (void)removeItem:(TTLauncherItem*)item animated:(BOOL)animated {
+  if ([_delegate respondsToSelector:@selector(launcherView:shouldRemoveItem:)]) {
+	  if (![_delegate launcherView:self shouldRemoveItem:item]) {
+		  return;
+	  }
+  }
+	
   NSMutableArray* itemPage = [self pageWithItem:item];
   if (itemPage) {
     TTLauncherButton* button = [self buttonForItem:item];

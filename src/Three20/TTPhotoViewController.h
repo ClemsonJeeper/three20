@@ -21,7 +21,7 @@
 @class TTScrollView, TTPhotoView, TTStyle;
 
 @interface TTPhotoViewController : TTModelViewController
-          <TTScrollViewDelegate, TTScrollViewDataSource, TTThumbsViewControllerDelegate> {
+          <TTScrollViewDelegate, TTScrollViewDataSource, TTThumbsViewControllerDelegate, UIActionSheetDelegate> {
   id<TTPhotoSource> _photoSource;
   id<TTPhoto> _centerPhoto;
   NSInteger _centerPhotoIndex;
@@ -31,6 +31,7 @@
   UIToolbar* _toolbar;
   UIBarButtonItem* _nextButton;
   UIBarButtonItem* _previousButton;
+  UIBarButtonItem* _actionButton;
   TTStyle* _captionStyle;
   UIImage* _defaultImage;
   NSString* _statusText;

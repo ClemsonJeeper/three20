@@ -58,6 +58,10 @@
     [UIView setAnimationDuration:TT_TRANSITION_DURATION];
   }
   
+	if (self.tabBarItem) {
+		keyboardBounds.size.height -= 50;
+	}
+	
   if (appearing) {
     [self keyboardWillAppear:animated withBounds:keyboardBounds];
     
