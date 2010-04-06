@@ -874,11 +874,17 @@ UIViewController* TTOpenURL(NSString* URL) {
 
   UIViewController* controller = nil;
   BOOL passedContainer = NO;
+  NSDictionary *prev = nil;
   for (NSDictionary* state in path) {
+	  if (prev && [[prev objectForKey:@"__hide_navbar_when_pushed__"] boolValue]) {
+		  [[controller navigationController] setNavigationBarHidden:YES];
+	  }
+	
     NSString* URL = [state objectForKey:@"__navigatorURL__"];
     controller = [self openURLAction:[[TTURLAction actionWithURLPath: URL]
                                                           applyState: state]];
     
+	  prev = state;
     // Stop if we reach a model view controller whose model could not be synchronously loaded.
     // That is because the controller after it may depend on the data it could not load, so
     // we'd better not risk opening more controllers that may not be able to function.
