@@ -31,20 +31,20 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Deprecated.
 + (id)topic:(NSString*)topic strong:(id)strong weak:(id)weak {
-  return [self topic:topic strong:strong weak:weak];
+  return [self topic:topic strongRef:strong weakRef:weak];
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Deprecated.
 + (id)weak:(id)weak {
-  return [self weak:weak];
+  return [self weakRef:weak];
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 - (id)initWithTopic:(NSString*)topic strong:(id)strong weak:(id)weak {
-  self = [self initWithTopic:topic strong:strong weak:weak];
+  self = [self initWithTopic:topic strongRef:strong weakRef:weak];
   return self;
 }
 

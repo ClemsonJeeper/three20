@@ -64,41 +64,13 @@
 	
   if (appearing) {
     [self keyboardWillAppear:animated withBounds:keyboardBounds];
-    
-    [self retain];
-    [NSTimer scheduledTimerWithTimeInterval:TT_TRANSITION_DURATION
-             target:self selector:@selector(keyboardDidAppearDelayed:)
-             userInfo:[NSValue valueWithCGRect:keyboardBounds] repeats:NO];
   } else {
-    [self keyboardWillDisappear:animated withBounds:keyboardBounds];
-
-    [self retain];
-    [NSTimer scheduledTimerWithTimeInterval:TT_TRANSITION_DURATION
-             target:self selector:@selector(keyboardDidDisappearDelayed:)
-             userInfo:[NSValue valueWithCGRect:keyboardBounds] repeats:NO];
+    [self keyboardDidDisappear:animated withBounds:keyboardBounds];
   }
-  
+
   if (animated) {
     [UIView commitAnimations];
   }
-}
-
-- (void)keyboardDidAppearDelayed:(NSTimer*)timer {
-  NSValue* value = timer.userInfo;
-  CGRect keyboardBounds;
-  [value getValue:&keyboardBounds];
-
-  [self keyboardDidAppear:YES withBounds:keyboardBounds];
-  [self autorelease];
-}
-
-- (void)keyboardDidDisappearDelayed:(NSTimer*)timer {
-  NSValue* value = timer.userInfo;
-  CGRect keyboardBounds;
-  [value getValue:&keyboardBounds];
-
-  [self keyboardDidDisappear:YES withBounds:keyboardBounds];
-  [self autorelease];
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,7 +85,7 @@
     _hasViewAppeared = NO;
     _isViewAppearing = NO;
     _autoresizesForKeyboard = NO;
-    
+
     self.navigationBarTintColor = TTSTYLEVAR(navigationBarTintColor);
   }
   return self;
@@ -130,15 +102,15 @@
 
   TT_RELEASE_SAFELY(_navigationBarTintColor);
   TT_RELEASE_SAFELY(_frozenState);
-  
-  // Removes keyboard notification observers for 
+
+  // Removes keyboard notification observers for
   self.autoresizesForKeyboard = NO;
 
   // You would think UIViewController would call this in dealloc, but it doesn't!
   // I would prefer not to have to redundantly put all view releases in dealloc and
   // viewDidUnload, so my solution is just to call viewDidUnload here.
   [self viewDidUnload];
-  
+
   [super dealloc];
 }
 
@@ -156,8 +128,8 @@
 
 - (void)loadView {
   [super loadView];
-  
-  CGRect frame = self.wantsFullScreenLayout ? TTScreenBounds() : TTNavigationFrame(); 
+
+  CGRect frame = self.wantsFullScreenLayout ? TTScreenBounds() : TTNavigationFrame();
   self.view = [[[UIView alloc] initWithFrame:frame] autorelease];
 	self.view.autoresizesSubviews = YES;
 	self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth
@@ -210,7 +182,7 @@
     [self persistView:state];
     self.frozenState = state;
     TT_RELEASE_SAFELY(state);
-  
+
     // This will come around to calling viewDidUnload
     [super didReceiveMemoryWarning];
 
@@ -289,10 +261,26 @@
   }
 }
 
-- (void)keyboardWillHide:(NSNotification*)notification {
+- (void)keyboardDidShow:(NSNotification *)notification {
+  NSValue* value = [notification.userInfo objectForKey:UIKeyboardBoundsUserInfoKey];
+  CGRect keyboardBounds;
+  [value getValue:&keyboardBounds];
+
+  [self keyboardDidAppear:YES withBounds:keyboardBounds];
+}
+
+- (void)keyboardDidHide:(NSNotification*)notification {
   if (self.isViewAppearing) {
     [self resizeForKeyboard:notification appearing:NO];
   }
+}
+
+- (void)keyboardWillHide:(NSNotification *)notification {
+  NSValue* value = [notification.userInfo objectForKey:UIKeyboardBoundsUserInfoKey];
+  CGRect keyboardBounds;
+  [value getValue:&keyboardBounds];
+
+  [self keyboardWillDisappear:YES withBounds:keyboardBounds];
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -311,7 +299,7 @@
       _searchController = [[TTSearchDisplayController alloc] initWithSearchBar:searchBar
                                                              contentsController:self];
     }
-    
+
     searchViewController.superController = self;
     _searchController.searchResultsViewController = searchViewController;
   } else {
@@ -323,17 +311,37 @@
 - (void)setAutoresizesForKeyboard:(BOOL)autoresizesForKeyboard {
   if (autoresizesForKeyboard != _autoresizesForKeyboard) {
     _autoresizesForKeyboard = autoresizesForKeyboard;
-    
+
     if (_autoresizesForKeyboard) {
       [[NSNotificationCenter defaultCenter] addObserver:self
-        selector:@selector(keyboardWillShow:) name:@"UIKeyboardWillShowNotification" object:nil];
+                                               selector:@selector(keyboardWillShow:)
+                                                   name:UIKeyboardWillShowNotification
+                                                 object:nil];
       [[NSNotificationCenter defaultCenter] addObserver:self
-        selector:@selector(keyboardWillHide:) name:@"UIKeyboardWillHideNotification" object:nil];
+                                               selector:@selector(keyboardWillHide:)
+                                                   name:UIKeyboardWillHideNotification
+                                                 object:nil];
+      [[NSNotificationCenter defaultCenter] addObserver:self
+                                               selector:@selector(keyboardDidShow:)
+                                                   name:UIKeyboardDidShowNotification
+                                                 object:nil];
+      [[NSNotificationCenter defaultCenter] addObserver:self
+                                               selector:@selector(keyboardDidHide:)
+                                                   name:UIKeyboardDidHideNotification
+                                                 object:nil];
     } else {
       [[NSNotificationCenter defaultCenter] removeObserver:self
-        name:@"UIKeyboardWillShowNotification" object:nil];
+                                                      name:UIKeyboardWillShowNotification
+                                                    object:nil];
       [[NSNotificationCenter defaultCenter] removeObserver:self
-        name:@"UIKeyboardWillHideNotification" object:nil];
+                                                      name:UIKeyboardWillHideNotification
+                                                    object:nil];
+      [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                      name:UIKeyboardDidShowNotification
+                                                    object:nil];
+      [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                      name:UIKeyboardDidHideNotification
+                                                    object:nil];
     }
   }
 }

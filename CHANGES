@@ -1,3 +1,19 @@
+Changes since February 26, 2010
+
+- [NEW] arrayForKey in the TTXMLAdditions.
+
+- [NEW] Support for successful HTTP status codes from [200, 300).
+
+- [NEW] Three20Core library.
+
+- [NEW] TTCoreDemo example project.
+
+- [FIXED] UIImage's transformWidth:height:rotate: implementation.
+
+- [FIXED] Keyboard display notifications.
+
+- [DOX] Doug Barth contributed complete documentation of TTMessageController.
+
 Changes since February 1, 2010
 
 - [NEW] TTTwitter sample app. See the README.mdown file for in-depth details.

@@ -14,8 +14,9 @@
 // limitations under the License.
 //
 
-#import "Three20/TTURLArgumentType.h"
-
-TTURLArgumentType TTConvertArgumentType(char argType);
-TTURLArgumentType TTURLArgumentTypeForProperty(Class cls, NSString* propertyName);
-
+int main(int argc, char *argv[]) {
+  NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+  int retVal = UIApplicationMain(argc, argv, nil, @"AppDelegate");
+  [pool release];
+  return retVal;
+}

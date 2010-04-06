@@ -14,8 +14,9 @@
 // limitations under the License.
 //
 
-#import "Three20/TTURLArgumentType.h"
+// Core
+#import "Three20/TTGlobalCore.h"
+#import "Three20/TTGlobalCoreLocale.h"
+#import "Three20/TTGlobalCorePaths.h"
 
-TTURLArgumentType TTConvertArgumentType(char argType);
-TTURLArgumentType TTURLArgumentTypeForProperty(Class cls, NSString* propertyName);
-
+#import "Three20/TTXMLParser.h"

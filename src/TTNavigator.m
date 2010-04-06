@@ -107,7 +107,7 @@ UIViewController* TTOpenURL(NSString* URL) {
     UINavigationController* navController = (UINavigationController*)controller;
     controller = navController.topViewController;
   }
-  
+
   if (controller.modalViewController) {
     return [TTNavigator frontViewControllerForController:controller.modalViewController];
   } else {
@@ -376,19 +376,32 @@ UIViewController* TTOpenURL(NSString* URL) {
     }
     theURL = [NSURL URLWithString:urlPath];
   }
-  
+
+  // Allows the delegate to prevent opening this URL
   if ([_delegate respondsToSelector:@selector(navigator:shouldOpenURL:)]) {
     if (![_delegate navigator:self shouldOpenURL:theURL]) {
       return nil;
     }
   }
-  
+
+  // Allows the delegate to modify the URL to be opened, as well as reject it. This delegate
+  // method is intended to supersede -navigator:shouldOpenURL:.
+  if ([_delegate respondsToSelector:@selector(navigator:URLToOpen:)]) {
+    NSURL *newURL = [_delegate navigator:self URLToOpen:theURL];
+    if (!newURL) {
+      return nil;
+    } else {
+      theURL = newURL;
+      urlPath = newURL.absoluteString;
+    }
+  }
+
   if (action.withDelay) {
     [self beginDelay];
   }
 
   TTDCONDITIONLOG(TTDFLAG_NAVIGATOR, @"OPENING URL %@", urlPath);
-  
+
   TTURLNavigatorPattern* pattern = nil;
   UIViewController* controller = [self viewControllerForURL: urlPath
                                                       query: action.query
@@ -403,7 +416,7 @@ UIViewController* TTOpenURL(NSString* URL) {
         modelViewController.model;
       }
     }
-    
+
     if ([_delegate respondsToSelector:@selector(navigator:willOpenURL:inViewController:)]) {
       [_delegate navigator: self
                willOpenURL: theURL
@@ -416,7 +429,7 @@ UIViewController* TTOpenURL(NSString* URL) {
                                  animated: action.animated
                                transition: action.transition ?
                                              action.transition : pattern.transition];
-  
+
     if (action.withDelay && !wasNew) {
       [self cancelDelay];
     }
@@ -446,14 +459,14 @@ UIViewController* TTOpenURL(NSString* URL) {
   if (self = [super init]) {
     _URLMap = [[TTURLMap alloc] init];
     _persistenceMode = TTNavigatorPersistenceModeNone;
-    
+
     // SwapMethods a new dealloc for UIViewController so it notifies us when it's going away.
     // We need to remove dying controllers from our binding cache.
     TTSwapMethods([UIViewController class], @selector(dealloc), @selector(ttdealloc));
 
     TTSwapMethods([UINavigationController class], @selector(popViewControllerAnimated:),
               @selector(popViewControllerAnimated2:));
-    
+
     [[NSNotificationCenter defaultCenter] addObserver:self
                                           selector:@selector(applicationWillTerminateNotification:)
                                           name:UIApplicationWillTerminateNotification
@@ -551,7 +564,10 @@ UIViewController* TTOpenURL(NSString* URL) {
 - (UIViewController*)topViewController {
   UIViewController* controller = _rootViewController;
   while (controller) {
-    UIViewController* child = controller.modalViewController;
+    UIViewController* child = controller.popupViewController;
+    if (!child || ![child canBeTopViewController]) {
+      child = controller.modalViewController;
+    }
     if (!child) {
       child = controller.topSubcontroller;
     }
@@ -701,7 +717,7 @@ UIViewController* TTOpenURL(NSString* URL) {
     controller = [self openURLAction:[TTURLAction actionWithURLPath:URL]];
     URL = va_arg(ap, id);
   }
-  va_end(ap); 
+  va_end(ap);
 
   return controller;
 }
@@ -762,7 +778,7 @@ UIViewController* TTOpenURL(NSString* URL) {
   if (object) {
     UIViewController* controller = object;
     controller.originalNavigatorURL = URL;
-    
+
     if (_delayCount) {
       if (!_delayedControllers) {
         _delayedControllers = [[NSMutableArray alloc] initWithObjects:controller,nil];
@@ -770,7 +786,7 @@ UIViewController* TTOpenURL(NSString* URL) {
         [_delayedControllers addObject:controller];
       }
     }
-    
+
     return controller;
   } else {
     return nil;
@@ -805,7 +821,7 @@ UIViewController* TTOpenURL(NSString* URL) {
     for (UIViewController* controller in _delayedControllers) {
       [controller delayDidEnd];
     }
-    
+
     TT_RELEASE_SAFELY(_delayedControllers);
   }
 }
@@ -830,7 +846,7 @@ UIViewController* TTOpenURL(NSString* URL) {
   NSMutableArray* path = [NSMutableArray array];
   [self persistController:_rootViewController path:path];
   TTDCONDITIONLOG(TTDFLAG_NAVIGATOR, @"DEBUG PERSIST %@", path);
-  
+
   // Check if any of the paths were "important", and therefore unable to expire
   BOOL important = NO;
   for (NSDictionary* state in path) {
@@ -839,7 +855,7 @@ UIViewController* TTOpenURL(NSString* URL) {
       break;
     }
   }
-  
+
   NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
   if (path.count) {
     [defaults setObject:path forKey:@"TTNavigatorHistory"];
@@ -858,14 +874,14 @@ UIViewController* TTOpenURL(NSString* URL) {
 /**
  * @public
  */
-- (UIViewController*)restoreViewControllers { 
+- (UIViewController*)restoreViewControllers {
   NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
   NSDate* timestamp = [defaults objectForKey:@"TTNavigatorHistoryTime"];
   NSArray* path = [defaults objectForKey:@"TTNavigatorHistory"];
   BOOL important = [[defaults objectForKey:@"TTNavigatorHistoryImportant"] boolValue];
   TTDCONDITIONLOG(TTDFLAG_NAVIGATOR, @"DEBUG RESTORE %@ FROM %@",
     path, [timestamp formatRelativeTime]);
-  
+
   BOOL expired = _persistenceExpirationAge
                  && -timestamp.timeIntervalSinceNow > _persistenceExpirationAge;
   if (expired && !important) {
@@ -883,8 +899,8 @@ UIViewController* TTOpenURL(NSString* URL) {
     NSString* URL = [state objectForKey:@"__navigatorURL__"];
     controller = [self openURLAction:[[TTURLAction actionWithURLPath: URL]
                                                           applyState: state]];
-    
 	  prev = state;
+
     // Stop if we reach a model view controller whose model could not be synchronously loaded.
     // That is because the controller after it may depend on the data it could not load, so
     // we'd better not risk opening more controllers that may not be able to function.
@@ -899,12 +915,12 @@ UIViewController* TTOpenURL(NSString* URL) {
     if (_persistenceMode == TTNavigatorPersistenceModeTop && passedContainer) {
       break;
     }
-    
+
     passedContainer = [controller canContainControllers];
   }
 
   [self.window makeKeyAndVisible];
-  
+
   return controller;
 }
 
@@ -917,7 +933,7 @@ UIViewController* TTOpenURL(NSString* URL) {
   NSString* URL = controller.navigatorURL;
   if (URL) {
     // Let the controller persists its own arbitrary state
-    NSMutableDictionary* state = [NSMutableDictionary dictionaryWithObject:URL  
+    NSMutableDictionary* state = [NSMutableDictionary dictionaryWithObject:URL
                                                       forKey:@"__navigatorURL__"];
     if ([controller persistView:state]) {
       [path addObject:state];
@@ -961,7 +977,7 @@ UIViewController* TTOpenURL(NSString* URL) {
       }
       controller = superController;
     }
-    
+
     return [paths componentsJoinedByString:@"/"];
   } else {
     return nil;

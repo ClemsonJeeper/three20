@@ -14,24 +14,28 @@
 // limitations under the License.
 //
 
-#import "Three20/TTModel.h"
+#import "Three20/TTURLRequestModel.h"
+
+#import "Three20/TTURLRequestQueue.h"
+#import "Three20/TTURLCache.h"
 
 #import "Three20/TTGlobalCore.h"
 
-#import "Three20/TTURLCache.h"
-#import "Three20/TTURLRequestQueue.h"
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-@implementation TTModel
+@implementation TTURLRequestModel
+
+@synthesize loadedTime  = _loadedTime;
+@synthesize cacheKey    = _cacheKey;
+@synthesize hasNoMore   = _hasNoMore;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (id)init {
   if (self = [super init]) {
-    _delegates = nil;
+    _isLoadingMore = NO;
   }
   return self;
 }
@@ -39,8 +43,21 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)dealloc {
-  TT_RELEASE_SAFELY(_delegates);
+  [[TTURLRequestQueue mainQueue] cancelRequestsWithDelegate:self];
+  [_loadingRequest cancel];
+
+  TT_RELEASE_SAFELY(_loadingRequest);
+  TT_RELEASE_SAFELY(_loadedTime);
+  TT_RELEASE_SAFELY(_cacheKey);
+
   [super dealloc];
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (void)reset {
+  TT_RELEASE_SAFELY(_cacheKey);
+  TT_RELEASE_SAFELY(_loadedTime);
 }
 
 
@@ -51,120 +68,103 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (NSMutableArray*)delegates {
-  if (!_delegates) {
-    _delegates = TTCreateNonRetainingArray();
-  }
-  return _delegates;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 - (BOOL)isLoaded {
-  return YES;
+  return !!_loadedTime;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (BOOL)isLoading {
-  return NO;
+  return !!_loadingRequest;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (BOOL)isLoadingMore {
-  return NO;
+  return _isLoadingMore;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (BOOL)isOutdated {
-  return NO;
-}
+  if (!_cacheKey && _loadedTime) {
+    return YES;
 
+  } else if (!_cacheKey) {
+    return NO;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-- (void)load:(TTURLRequestCachePolicy)cachePolicy more:(BOOL)more {
+  } else {
+    NSDate* loadedTime = self.loadedTime;
+
+    if (loadedTime) {
+      return -[loadedTime timeIntervalSinceNow] > [TTURLCache sharedCache].invalidationAge;
+
+    } else {
+      return NO;
+    }
+  }
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)cancel {
+  [_loadingRequest cancel];
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)invalidate:(BOOL)erase {
+  if (_cacheKey) {
+    if (erase) {
+      [[TTURLCache sharedCache] removeKey:_cacheKey];
+
+    } else {
+      [[TTURLCache sharedCache] invalidateKey:_cacheKey];
+    }
+
+    TT_RELEASE_SAFELY(_cacheKey);
+  }
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark -
-#pragma mark Public
+#pragma mark TTURLRequestDelegate
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (void)didStartLoad {
-  [_delegates perform:@selector(modelDidStartLoad:) withObject:self];
+- (void)requestDidStartLoad:(TTURLRequest*)request {
+  [_loadingRequest release];
+  _loadingRequest = [request retain];
+  [self didStartLoad];
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (void)didFinishLoad {
-  [_delegates perform:@selector(modelDidFinishLoad:) withObject:self];
+- (void)requestDidFinishLoad:(TTURLRequest*)request {
+  if (!self.isLoadingMore) {
+    [_loadedTime release];
+    _loadedTime = [request.timestamp retain];
+    self.cacheKey = request.cacheKey;
+  }
+
+  TT_RELEASE_SAFELY(_loadingRequest);
+  [self didFinishLoad];
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (void)didFailLoadWithError:(NSError*)error {
-  [_delegates perform:@selector(model:didFailLoadWithError:) withObject:self
-    withObject:error];
+- (void)request:(TTURLRequest*)request didFailLoadWithError:(NSError*)error {
+  TT_RELEASE_SAFELY(_loadingRequest);
+  [self didFailLoadWithError:error];
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-- (void)didCancelLoad {
-  [_delegates perform:@selector(modelDidCancelLoad:) withObject:self];
-}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-- (void)beginUpdates {
-  [_delegates perform:@selector(modelDidBeginUpdates:) withObject:self];
-}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-- (void)endUpdates {
-  [_delegates perform:@selector(modelDidEndUpdates:) withObject:self];
-}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-- (void)didUpdateObject:(id)object atIndexPath:(NSIndexPath*)indexPath {
-  [_delegates perform:@selector(model:didUpdateObject:atIndexPath:) withObject:self
-              withObject:object withObject:indexPath];
-}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-- (void)didInsertObject:(id)object atIndexPath:(NSIndexPath*)indexPath {
-  [_delegates perform:@selector(model:didInsertObject:atIndexPath:) withObject:self
-              withObject:object withObject:indexPath];
-}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-- (void)didDeleteObject:(id)object atIndexPath:(NSIndexPath*)indexPath {
-  [_delegates perform:@selector(model:didDeleteObject:atIndexPath:) withObject:self
-              withObject:object withObject:indexPath];
-}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-- (void)didChange {
-  [_delegates perform:@selector(modelDidChange:) withObject:self];
+- (void)requestDidCancelLoad:(TTURLRequest*)request {
+  TT_RELEASE_SAFELY(_loadingRequest);
+  [self didCancelLoad];
 }
 
 
