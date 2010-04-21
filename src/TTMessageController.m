@@ -16,180 +16,92 @@
 
 #import "Three20/TTMessageController.h"
 
+#import "Three20/TTMessageControllerDelegate.h"
+
+#import "Three20/TTMessageRecipientField.h"
+#import "Three20/TTMessageTextField.h"
+#import "Three20/TTMessageSubjectField.h"
+#import "Three20/TTTextEditor.h"
+
 #import "Three20/TTGlobalCore.h"
 #import "Three20/TTGlobalCoreLocale.h"
 #import "Three20/TTGlobalUI.h"
 #import "Three20/TTGlobalUINavigator.h"
+#import "Three20/TTGlobalStyle.h"
 
 #import "Three20/TTTableViewDataSource.h"
 #import "Three20/TTDefaultStyleSheet.h"
 #import "Three20/TTPickerTextField.h"
 #import "Three20/TTActivityLabel.h"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-@implementation TTMessageField
-
-@synthesize title = _title, required = _required;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// NSObject
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+@implementation TTMessageController
 
-- (id)initWithTitle:(NSString*)title required:(BOOL)required {
+@synthesize fields                = _fields;
+@synthesize isModified            = _isModified;
+@synthesize showsRecipientPicker  = _showsRecipientPicker;
+@synthesize dataSource            = _dataSource;
+@synthesize delegate              = _delegate;
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (id)initWithRecipients:(NSArray*)recipients {
   if (self = [self init]) {
-    _title = [title copy];
-    _required = required;
+    _initialRecipients = [recipients retain];
   }
+
   return self;
 }
 
-- (NSString*)description {
-  return [NSString stringWithFormat:@"%@", _title];
-}
-
-- (void)dealloc {
-  TT_RELEASE_SAFELY(_title);
-  [super dealloc];
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// public
-
-- (TTPickerTextField*)createViewForController:(TTMessageController*)controller {
-  return nil;
-}
-
-- (id)persistField:(UITextField*)textField {
-  return nil;
-}
-
-- (void)restoreField:(UITextField*)textField withData:(id)data {
-}
-
-@end
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-@implementation TTMessageRecipientField
-
-@synthesize recipients = _recipients;
-
 - (id)init {
   if (self = [super init]) {
-    _recipients = nil;
+    _fields = [[NSArray alloc] initWithObjects:
+               [[[TTMessageRecipientField alloc] initWithTitle: TTLocalizedString(@"To:", @"")
+                                                      required: YES] autorelease],
+               [[[TTMessageSubjectField alloc] initWithTitle: TTLocalizedString(@"Subject:", @"")
+                                                    required: NO] autorelease],
+               nil];
+
+    self.title = TTLocalizedString(@"New Message", @"");
+
+    self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc]
+                                              initWithTitle: TTLocalizedString(@"Cancel", @"")
+                                              style: UIBarButtonItemStyleBordered
+                                              target: self
+                                              action: @selector(cancel)] autorelease];
+    self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc]
+                                               initWithTitle: TTLocalizedString(@"Send", @"")
+                                               style: UIBarButtonItemStyleDone
+                                               target: self
+                                               action: @selector(send)] autorelease];
+    self.navigationItem.rightBarButtonItem.enabled = NO;
   }
+
   return self;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)dealloc {
-  TT_RELEASE_SAFELY(_recipients);
+  TT_RELEASE_SAFELY(_dataSource);
+  TT_RELEASE_SAFELY(_fields);
+  TT_RELEASE_SAFELY(_initialRecipients);
+
   [super dealloc];
 }
 
-- (NSString*)description {
-  return [NSString stringWithFormat:@"%@ %@", _title, _recipients];
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// TTMessageField
-
-- (UITextField*)createViewForController:(TTMessageController*)controller {
-  TTPickerTextField* textField = [[[TTPickerTextField alloc] init] autorelease];
-  textField.dataSource = controller.dataSource;
-  textField.autocorrectionType = UITextAutocorrectionTypeNo;
-  textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
-  textField.rightViewMode = UITextFieldViewModeAlways;
-
-  if (controller.showsRecipientPicker) {
-    UIButton* addButton = [UIButton buttonWithType:UIButtonTypeContactAdd];
-    [addButton addTarget:controller action:@selector(showRecipientPicker)
-      forControlEvents:UIControlEventTouchUpInside];
-    textField.rightView = addButton;
-  }
-  return textField;
-}
-
-- (id)persistField:(UITextField*)textField {
-  if ([textField isKindOfClass:[TTPickerTextField class]]) {
-    TTPickerTextField* picker = (TTPickerTextField*)textField;
-    NSMutableArray* cellsData = [NSMutableArray array];
-    for (id cell in picker.cells) {
-      if ([cell conformsToProtocol:@protocol(NSCoding)]) {
-        NSData* data = [NSKeyedArchiver archivedDataWithRootObject:cell];
-        [cellsData addObject:data];
-      }
-    }
-    return [NSDictionary dictionaryWithObjectsAndKeys:cellsData, @"cells",
-                                                      textField.text, @"text", nil];
-  } else {
-    return [NSDictionary dictionaryWithObjectsAndKeys:textField.text, @"text", nil];
-  }
-}
-
-- (void)restoreField:(UITextField*)textField withData:(id)data {
-  NSDictionary* dict = data;
-
-  if ([textField isKindOfClass:[TTPickerTextField class]]) {
-    TTPickerTextField* picker = (TTPickerTextField*)textField;
-    NSArray* cellsData = [dict objectForKey:@"cells"];
-    [picker removeAllCells];
-    for (id cellData in cellsData) {
-      id cell = [NSKeyedUnarchiver unarchiveObjectWithData:cellData];
-      [picker addCellWithObject:cell];
-    }
-  }
-  
-  textField.text = [dict objectForKey:@"text"];
-}
-
-@end
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma mark -
+#pragma mark Private
 
-@implementation TTMessageTextField
-
-@synthesize text = _text;
-
-- (id)init {
-  if (self = [super init]) {
-    _text = nil;
-  }
-  return self;
-}
-
-- (NSString*)description {
-  return [NSString stringWithFormat:@"%@ %@", _title, _text];
-}
-
-- (void)dealloc {
-  TT_RELEASE_SAFELY(_text);
-  [super dealloc];
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// TTMessageField
-
-- (UITextField*)createViewForController:(TTMessageController*)controller {
-  return [[[TTPickerTextField alloc] init] autorelease];
-}
-
-- (id)persistField:(UITextField*)textField {
-  return textField.text;
-}
-
-- (void)restoreField:(UITextField*)textField withData:(id)data {
-  textField.text = data;
-}
-
-@end
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-@implementation TTMessageSubjectField
-@end
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
+<<<<<<< HEAD
 @implementation FRAttachmentField
 @synthesize uploading = _uploading;
 @end
@@ -200,25 +112,28 @@
 
 @synthesize delegate = _delegate, dataSource = _dataSource, fields = _fields,
             isModified = _isModified, showsRecipientPicker = _showsRecipientPicker;
+=======
+>>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// private
-
 - (void)cancel {
   [self cancel:YES];
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)createFieldViews {
   for (UIView* view in _fieldViews) {
     [view removeFromSuperview];
   }
-  
+
   [_textEditor removeFromSuperview];
-  
+
   [_fieldViews release];
   _fieldViews = [[NSMutableArray alloc] init];
 
   for (TTMessageField* field in _fields) {
+<<<<<<< HEAD
 	  if ([field isKindOfClass:[FRAttachmentField class]]) {
 		  UIView *v = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 40)] autorelease];
 		  TTButton *button = [TTButton buttonWithStyle:@"smallEmbossedButton:" title:field.title];
@@ -264,6 +179,30 @@
 		}
 	  }
 	  UIView* separator = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 1)] autorelease];
+=======
+    TTPickerTextField* textField = [field createViewForController:self];
+    if (textField) {
+      textField.delegate = self;
+      textField.backgroundColor = TTSTYLEVAR(backgroundColor);
+      textField.font = TTSTYLEVAR(messageFont);
+      textField.returnKeyType = UIReturnKeyNext;
+      textField.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+      [textField sizeToFit];
+
+      UILabel* label = [[[UILabel alloc] init] autorelease];
+      label.text = field.title;
+      label.font = TTSTYLEVAR(messageFont);
+      label.textColor = TTSTYLEVAR(messageFieldTextColor);
+      [label sizeToFit];
+      label.frame = CGRectInset(label.frame, -2, 0);
+      textField.leftView = label;
+      textField.leftViewMode = UITextFieldViewModeAlways;
+
+      [_scrollView addSubview:textField];
+      [_fieldViews addObject:textField];
+
+      UIView* separator = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 1)] autorelease];
+>>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
       separator.backgroundColor = TTSTYLEVAR(messageFieldSeparatorColor);
       separator.autoresizingMask = UIViewAutoresizingFlexibleWidth;
       [_scrollView addSubview:separator];
@@ -273,17 +212,21 @@
   [_scrollView addSubview:_textEditor];
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)layoutViews {
   CGFloat y = 0;
-  
+
   for (UIView* view in _scrollView.subviews) {
     view.frame = CGRectMake(0, y, self.view.width, view.height);
     y += view.height;
   }
-  
+
   _scrollView.contentSize = CGSizeMake(_scrollView.width, y);
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (BOOL)hasEnteredText {
   for (int i = 0; i < _fields.count; ++i) {
     TTMessageField* field = [_fields objectAtIndex:i];
@@ -293,6 +236,7 @@
         if (textField.cells.count) {
           return YES;
         }
+
       } else if ([field isKindOfClass:[TTMessageTextField class]]) {
         UITextField* textField = [_fieldViews objectAtIndex:i];
         if (!textField.text.isEmptyOrWhitespace) {
@@ -301,10 +245,12 @@
       }
     }
   }
-  
+
   return _textEditor.text.length;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (BOOL)hasRequiredText {
   BOOL compliant = YES;
 
@@ -319,6 +265,7 @@
         if (!textField.cells.count) {
           compliant = NO;
         }
+
       } else if ([field isKindOfClass:[TTMessageTextField class]]) {
         UITextField* textField = [_fieldViews objectAtIndex:i];
         if (textField.text.isEmptyOrWhitespace) {
@@ -327,14 +274,18 @@
       }
     }
   }
-  
+
   return compliant && _textEditor.text.length;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)updateSendCommand {
   self.navigationItem.rightBarButtonItem.enabled = [self hasRequiredText];
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (UITextField*)subjectField {
   for (int i = 0; i < _fields.count; ++i) {
     TTMessageField* field = [_fields objectAtIndex:i];
@@ -342,9 +293,11 @@
       return [_fieldViews objectAtIndex:i];
     }
   }
-  return nil;    
+  return nil;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)setTitleToSubject {
   UITextField* subjectField = self.subjectField;
   if (subjectField) {
@@ -353,6 +306,8 @@
   [self updateSendCommand];
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (NSInteger)fieldIndexOfFirstResponder {
   NSInteger index = 0;
   for (UIView* view in _fieldViews) {
@@ -361,29 +316,36 @@
     }
     ++index;
   }
+
   if (_textEditor.isFirstResponder) {
     return _fieldViews.count;
   }
   return -1;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)setFieldIndexOfFirstResponder:(NSInteger)index {
   if (index < _fieldViews.count) {
     UIView* view = [_fieldViews objectAtIndex:index];
     [view becomeFirstResponder];
+
   } else {
     [_textEditor becomeFirstResponder];
   }
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)showRecipientPicker {
   [self messageWillShowRecipientPicker];
-  
+
   if ([_delegate respondsToSelector:@selector(composeControllerShowRecipientPicker:)]) {
     [_delegate composeControllerShowRecipientPicker:self];
   }
 }
 
+<<<<<<< HEAD
 - (void)showAttachmentPicker
 {
 	if ([_delegate respondsToSelector:@selector(composeControllerShowAttachmentPicker:)]) {
@@ -400,50 +362,20 @@
   }
   return self;
 }
-
-- (id)init {
-  if (self = [super init]) {
-    _delegate = nil;
-    _dataSource = nil;
-    _fields = [[NSArray alloc] initWithObjects:
-      [[[TTMessageRecipientField alloc] initWithTitle:
-        TTLocalizedString(@"To:", @"") required:YES] autorelease],
-      [[[TTMessageSubjectField alloc] initWithTitle:
-        TTLocalizedString(@"Subject:", @"") required:NO] autorelease],
-      nil];
-    _fieldViews = nil;
-    _initialRecipients = nil;
-    _activityView = nil;
-    _showsRecipientPicker = NO;
-    _isModified = NO;
-    
-    self.title = TTLocalizedString(@"New Message", @"");
-
-    self.navigationItem.leftBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:
-      TTLocalizedString(@"Cancel", @"")
-      style:UIBarButtonItemStyleBordered target:self action:@selector(cancel)] autorelease];
-    self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:
-      TTLocalizedString(@"Send", @"")
-      style:UIBarButtonItemStyleDone target:self action:@selector(send)] autorelease];
-    self.navigationItem.rightBarButtonItem.enabled = NO;
-  }
-  return self;
-}
-
-- (void)dealloc {
-  TT_RELEASE_SAFELY(_dataSource);
-  TT_RELEASE_SAFELY(_fields);
-  TT_RELEASE_SAFELY(_initialRecipients);
-  [super dealloc];
-}
+=======
+>>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// UIViewController
+///////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma mark -
+#pragma mark UIViewController
 
-- (void)loadView {  
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+- (void)loadView {
   [super loadView];
   self.view.backgroundColor = TTSTYLEVAR(backgroundColor);
-  
+
   _scrollView = [[[UIScrollView class] alloc] initWithFrame:TTKeyboardNavigationFrame()];
   _scrollView.backgroundColor = TTSTYLEVAR(backgroundColor);
   _scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
@@ -461,11 +393,13 @@
   _textEditor.showsExtraLine = YES;
   _textEditor.minNumberOfLines = 6;
   [_textEditor sizeToFit];
-  
+
   [self createFieldViews];
   [self layoutViews];
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)viewDidUnload {
   [super viewDidUnload];
   TT_RELEASE_SAFELY(_scrollView);
@@ -474,6 +408,8 @@
   TT_RELEASE_SAFELY(_activityView);
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
 
@@ -494,23 +430,32 @@
     }
     [[self viewForFieldAtIndex:0] becomeFirstResponder];
   }
-  
+
   [self updateSendCommand];
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
   return TTIsSupportedOrientation(interfaceOrientation);
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
   [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
   _scrollView.height = self.view.height - TTKeyboardHeight();
   [self layoutViews];
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// UTViewController (TTCategory)
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma mark -
+#pragma mark UTViewController (TTCategory)
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (BOOL)persistView:(NSMutableDictionary*)state {
   NSMutableArray* fields = [NSMutableArray array];
   for (NSInteger i = 0; i < _fields.count; ++i) {
@@ -532,13 +477,15 @@
 
   CGFloat scrollY = _scrollView.contentOffset.y;
   [state setObject:[NSNumber numberWithFloat:scrollY] forKey:@"scrollOffsetY"];
-  
+
   NSInteger firstResponder = [self fieldIndexOfFirstResponder];
   [state setObject:[NSNumber numberWithInt:firstResponder] forKey:@"firstResponder"];
   [state setObject:[NSNumber numberWithBool:YES] forKey:@"__important__"];
   return [super persistView:state];
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)restoreView:(NSDictionary*)state {
   self.view;
   TT_RELEASE_SAFELY(_initialRecipients);
@@ -552,7 +499,7 @@
       [field restoreField:view withData:data];
     }
   }
-  
+
   NSString* body = [state objectForKey:@"body"];
   if (body) {
     self.body = body;
@@ -565,9 +512,14 @@
   [self setFieldIndexOfFirstResponder:firstResponder];
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// UITextFieldDelegate
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma mark -
+#pragma mark UITextFieldDelegate
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range
   replacementString:(NSString *)string {
   if (textField == self.subjectField) {
@@ -578,6 +530,8 @@
   return YES;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
   NSUInteger fieldIndex = [_fieldViews indexOfObject:textField];
   UIView* nextView = fieldIndex == _fieldViews.count-1
@@ -587,26 +541,39 @@
   return NO;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)textField:(TTPickerTextField*)textField didAddCellAtIndex:(NSInteger)index {
   [self updateSendCommand];
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)textField:(TTPickerTextField*)textField didRemoveCellAtIndex:(NSInteger)index {
   [self updateSendCommand];
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)textFieldDidResize:(TTPickerTextField*)textField {
   [self layoutViews];
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// TTTextEditorDelegate
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma mark -
+#pragma mark TTTextEditorDelegate
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)textEditorDidChange:(TTTextEditor*)textEditor {
   [self updateSendCommand];
   _isModified = YES;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (BOOL)textEditor:(TTTextEditor*)textEditor shouldResizeBy:(CGFloat)height {
   _textEditor.frame = TTRectContract(_textEditor.frame, 0, -height);
   [self layoutViews];
@@ -614,17 +581,28 @@
   return NO;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// UIAlertViewDelegate
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma mark -
+#pragma mark UIAlertViewDelegate
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
   if (buttonIndex == 0) {
     [self cancel:NO];
   }
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+#pragma mark -
+#pragma mark Properties
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (NSString*)subject {
   self.view;
   for (int i = 0; i < _fields.count; ++i) {
@@ -637,6 +615,8 @@
   return nil;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)setSubject:(NSString*)subject {
   self.view;
   for (int i = 0; i < _fields.count; ++i) {
@@ -649,20 +629,26 @@
   }
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (NSString*)body {
   return _textEditor.text;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)setBody:(NSString*)body {
   self.view;
   _textEditor.text = body;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)setDataSource:(id<TTTableViewDataSource>)dataSource {
   if (dataSource != _dataSource) {
     [_dataSource release];
     _dataSource = [dataSource retain];
-    
+
     for (UITextField* textField in _fieldViews) {
       if ([textField isKindOfClass:[TTPickerTextField class]]) {
         TTPickerTextField* menuTextField = (TTPickerTextField*)textField;
@@ -672,17 +658,21 @@
   }
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)setFields:(NSArray*)fields {
   if (fields != _fields) {
     [_fields release];
     _fields = [fields retain];
-    
+
     if (_fieldViews) {
       [self createFieldViews];
     }
   }
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)addRecipient:(id)recipient forFieldAtIndex:(NSUInteger)fieldIndex {
   self.view;
   TTPickerTextField* textField = [_fieldViews objectAtIndex:fieldIndex];
@@ -694,9 +684,11 @@
   }
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (NSString*)textForFieldAtIndex:(NSUInteger)fieldIndex {
   self.view;
-  
+
   NSString* text = nil;
   if (fieldIndex == _fieldViews.count) {
     text = _textEditor.text;
@@ -711,6 +703,8 @@
   return [text stringByTrimmingCharactersInSet:whitespace];
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)setText:(NSString*)text forFieldAtIndex:(NSUInteger)fieldIndex {
   self.view;
   if (fieldIndex == _fieldViews.count) {
@@ -723,9 +717,11 @@
   }
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (BOOL)fieldHasValueAtIndex:(NSUInteger)fieldIndex {
   self.view;
-  
+
   if (fieldIndex == _fieldViews.count) {
     return _textEditor.text.length > 0;
   } else {
@@ -742,9 +738,11 @@
   }
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (UIView*)viewForFieldAtIndex:(NSUInteger)fieldIndex {
   self.view;
-  
+
   if (fieldIndex == _fieldViews.count) {
     return _textEditor;
   } else {
@@ -752,10 +750,15 @@
   }
 }
 
+<<<<<<< HEAD
 - (TTMessageField *)fieldForFieldAtIndex:(NSUInteger)fieldIndex {
 	return [_fields objectAtIndex:fieldIndex];
 }
 
+=======
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+>>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
 - (void)send {
   NSMutableArray* fields = [[_fields mutableCopy] autorelease];
   for (int i = 0; i < fields.count; ++i) {
@@ -768,23 +771,25 @@
       [(TTMessageTextField*)field setText:textField.text];
     }
   }
-  
+
   TTMessageTextField* bodyField = [[[TTMessageTextField alloc] initWithTitle:nil
                                                                required:NO] autorelease];
   bodyField.text = _textEditor.text;
   [fields addObject:bodyField];
-  
+
   [self showActivityView:YES];
-  
+
   [self messageWillSend:fields];
 
   if ([_delegate respondsToSelector:@selector(composeController:didSendFields:)]) {
     [_delegate composeController:self didSendFields:fields];
   }
-  
+
   [self messageDidSend];
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)cancel:(BOOL)confirmIfNecessary {
   if (confirmIfNecessary && ![self messageShouldCancel]) {
     [self confirmCancellation];
@@ -792,11 +797,13 @@
     if ([_delegate respondsToSelector:@selector(composeControllerWillCancel:)]) {
       [_delegate composeControllerWillCancel:self];
     }
-    
+
     [self dismissModalViewController];
   }
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)confirmCancellation {
   UIAlertView* cancelAlertView = [[[UIAlertView alloc] initWithTitle:
     TTLocalizedString(@"Cancel", @"")
@@ -807,6 +814,8 @@
   [cancelAlertView show];
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)showActivityView:(BOOL)show {
   self.navigationItem.rightBarButtonItem.enabled = !show;
   if (show) {
@@ -824,21 +833,32 @@
   }
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (NSString*)titleForSending {
   return TTLocalizedString(@"Sending...", @"");
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (BOOL)messageShouldCancel {
   return ![self hasEnteredText] || !_isModified;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)messageWillShowRecipientPicker {
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)messageWillSend:(NSArray*)fields {
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)messageDidSend {
 }
+
 
 @end

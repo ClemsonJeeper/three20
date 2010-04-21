@@ -14,12 +14,23 @@
 // limitations under the License.
 //
 
+<<<<<<< HEAD
 #import "Three20/TTModelViewController.h"
 #import "Three20/TTTextEditor.h"
 #import "Three20/TTButton.h"
 
 @protocol TTTableViewDataSource, TTMessageControllerDelegate;
 @class TTPickerTextField, TTActivityLabel, TTMessageField;
+=======
+#import "Three20/TTViewController.h"
+#import "Three20/TTTextEditorDelegate.h"
+
+#import "Three20/TTMessageField.h"
+
+@protocol TTTableViewDataSource, TTMessageControllerDelegate;
+@class TTPickerTextField, TTActivityLabel;
+@class TTTextEditor;
+>>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
 
 /**
  * A view controller for composing email like messages, which is visually
@@ -36,62 +47,66 @@
  * useful when you want to customize the fields presented to the user.
  */
 @interface TTMessageController : TTViewController <UITextFieldDelegate, TTTextEditorDelegate> {
-  id<TTMessageControllerDelegate> _delegate;
-  id<TTTableViewDataSource> _dataSource;
-  NSArray* _fields;
-  NSMutableArray* _fieldViews;
-  UIScrollView* _scrollView;
-  TTTextEditor* _textEditor;
-  TTActivityLabel* _activityView;
-  NSArray* _initialRecipients;
+@protected
+  NSArray*          _fields;
+  NSMutableArray*   _fieldViews;
+  UIScrollView*     _scrollView;
+  TTTextEditor*     _textEditor;
+  TTActivityLabel*  _activityView;
+  NSArray*          _initialRecipients;
+
   BOOL _showsRecipientPicker;
   BOOL _isModified;
+
+  id<TTTableViewDataSource>       _dataSource;
+  id<TTMessageControllerDelegate> _delegate;
 }
 
 /**
  * The delegate that will receive messages from the TTMessageControllerDelegate
  * protocol.
  */
-@property(nonatomic,assign) id<TTMessageControllerDelegate> delegate;
+@property (nonatomic, assign) id<TTMessageControllerDelegate> delegate;
 
 /**
  * The datasource used to autocomplete TTMessageRecipientFields. This class is
  * also responsible for determining how cells representing recipients are
  * labeled.
  */
-@property(nonatomic,retain) id<TTTableViewDataSource> dataSource;
+@property (nonatomic, retain) id<TTTableViewDataSource> dataSource;
 
 /**
  * An array of TTMessageField instances representing the editable fields. These
  * fields are rendered in order using appropriate views for each field type.
  */
-@property(nonatomic,retain) NSArray* fields;
+@property (nonatomic, retain) NSArray* fields;
 
 /**
  * A convenience property for editing the text value of the
  * TTMessageSubjectField. If no TTMessageSubjectField is found in the fields
  * array, nil will be returned from the getter and the setter will be a no-op.
  */
-@property(nonatomic,retain) NSString* subject;
+@property (nonatomic, retain) NSString* subject;
 
 /**
  * The body of the message. The body is not required for the user to send a
  * message.
  */
-@property(nonatomic,retain) NSString* body;
+@property (nonatomic, retain) NSString* body;
 
 /**
  * Controls whether a contact add button is shown in the views for
  * TTMessageRecipientField instances.
  */
-@property(nonatomic) BOOL showsRecipientPicker;
+@property (nonatomic) BOOL showsRecipientPicker;
 
 /**
  * Indicates if this message has been modified since it was originally
  * shown. If the message has been modified, the user will be asked for
  * confirmation before their cancel request is enacted.
  */
-@property(nonatomic,readonly) BOOL isModified;
+@property (nonatomic, readonly) BOOL isModified;
+
 
 /**
  * Initializes the class with an array of recipients. These recipients will
@@ -201,6 +216,7 @@
 - (void)updateSendCommand;
 
 @end
+<<<<<<< HEAD
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -307,3 +323,5 @@
 @property (nonatomic, assign) BOOL uploading;
 
 @end
+=======
+>>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821

@@ -16,6 +16,7 @@
 
 #import "Three20/TTUserInfo.h"
 
+// Core
 #import "Three20/TTCorePreprocessorMacros.h"
 
 
@@ -28,6 +29,7 @@
 @synthesize strongRef = _strongRef;
 @synthesize weakRef   = _weakRef;
 
+<<<<<<< HEAD
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Deprecated.
 + (id)topic:(NSString*)topic strong:(id)strong weak:(id)weak {
@@ -48,6 +50,8 @@
   return self;
 }
 
+=======
+>>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 + (id)topic:(NSString*)topic strongRef:(id)strongRef weakRef:(id)weakRef {

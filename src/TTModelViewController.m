@@ -16,10 +16,10 @@
 
 #import "Three20/TTModelViewController.h"
 
+#import "Three20/TTNavigator.h"
+
 #import "Three20/TTGlobalCore.h"
 #import "Three20/TTGlobalUI.h"
-
-#import "Three20/TTNavigator.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,21 +34,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (id)init {
   if (self = [super init]) {
-    _model = nil;
-    _modelError = nil;
-    _flags.isModelDidRefreshInvalid = NO;
-    _flags.isModelWillLoadInvalid = NO;
-    _flags.isModelDidLoadInvalid = NO;
-    _flags.isModelDidLoadFirstTimeInvalid = NO;
-    _flags.isModelDidShowFirstTimeInvalid = NO;
     _flags.isViewInvalid = YES;
-    _flags.isViewSuspended = NO;
-    _flags.isUpdatingView = NO;
-    _flags.isShowingEmpty = NO;
-    _flags.isShowingLoading = NO;
-    _flags.isShowingModel = NO;
-    _flags.isShowingError = NO;
   }
+
   return self;
 }
 
@@ -69,9 +57,6 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * @private
- */
 - (void)resetViewStates {
   if (_flags.isShowingLoading) {
     [self showLoading:NO];
@@ -93,9 +78,6 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * @private
- */
 - (void)updateViewStates {
   if (_flags.isModelDidRefreshInvalid) {
     [self didRefreshModel];
@@ -179,9 +161,6 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * @private
- */
 - (void)createInterstitialModel {
   self.model = [[[TTModel alloc] init] autorelease];
 }
@@ -209,6 +188,7 @@
   if (_hasViewAppeared && !_isViewAppearing) {
     [super didReceiveMemoryWarning];
     [self refresh];
+
   } else {
     [super didReceiveMemoryWarning];
   }
@@ -320,6 +300,7 @@
     if (![TTNavigator navigator].isDelayed) {
       [self createModel];
     }
+
     if (!_model) {
       [self createInterstitialModel];
     }

@@ -20,14 +20,23 @@
 
 #import "Three20/TTTableViewDataSource.h"
 #import "Three20/TTTableViewController.h"
+
+// Table Items
 #import "Three20/TTTableItem.h"
-#import "Three20/TTTableItemCell.h"
+#import "Three20/TTTableLinkedItem.h"
+#import "Three20/TTTableButton.h"
+#import "Three20/TTTableMoreButton.h"
+
+// Table Item Cells
+#import "Three20/TTTableMoreButtonCell.h"
+
 #import "Three20/TTTableHeaderView.h"
 #import "Three20/TTTableView.h"
 #import "Three20/TTStyledTextLabel.h"
 #import "Three20/TTNavigator.h"
 #import "Three20/TTDefaultStyleSheet.h"
 #import "Three20/TTURLRequestQueue.h"
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -21,6 +21,7 @@
 
 @interface TTLauncherItem : NSObject <NSCoding> {
   TTLauncherView* _launcher;
+<<<<<<< HEAD
   NSString* _title;
   NSString* _image;
 	UIImage *_rawImage;
@@ -40,6 +41,26 @@
 @property(nonatomic,copy) NSString* style;
 @property(nonatomic) NSInteger badgeNumber;
 @property(nonatomic) BOOL canDelete;
+=======
+
+  NSString*       _title;
+  NSString*       _image;
+  NSString*       _URL;
+
+  NSString*       _style;
+  NSInteger       _badgeNumber;
+
+  BOOL            _canDelete;
+}
+
+@property (nonatomic, assign) TTLauncherView* launcher;
+@property (nonatomic, copy)   NSString*       title;
+@property (nonatomic, copy)   NSString*       image;
+@property (nonatomic, copy)   NSString*       URL;
+@property (nonatomic, copy)   NSString*       style;
+@property (nonatomic)         NSInteger       badgeNumber;
+@property (nonatomic)         BOOL            canDelete;
+>>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
 
 - (id)initWithTitle:(NSString*)title image:(NSString*)image URL:(NSString*)URL;
 - (id)initWithTitle:(NSString*)title image:(NSString*)image URL:(NSString*)URL
