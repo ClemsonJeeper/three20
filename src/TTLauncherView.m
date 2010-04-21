@@ -53,6 +53,7 @@ static const NSInteger kDefaultColumnCount = 3;
 @synthesize prompt      = _prompt;
 @synthesize editing     = _editing;
 @synthesize delegate    = _delegate;
+@synthesize scrollView  = _scrollView;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -105,13 +106,8 @@ static const NSInteger kDefaultColumnCount = 3;
   TT_RELEASE_SAFELY(_scrollView);
   TT_RELEASE_SAFELY(_pager);
 
-<<<<<<< HEAD
-@synthesize delegate = _delegate, columnCount = _columnCount, prompt = _prompt, editing = _editing;
-@synthesize scrollView = _scrollView;
-=======
   [super dealloc];
 }
->>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

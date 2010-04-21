@@ -31,18 +31,14 @@ static const NSTimeInterval kPauseInterval = 0.4;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 @implementation TTSearchDisplayController
 
-<<<<<<< HEAD
-@synthesize searchResultsViewController = _searchResultsViewController,
-            pausesBeforeSearching = _pausesBeforeSearching,
-			pauseInterval = _pauseInterval;
-=======
 @synthesize searchResultsViewController = _searchResultsViewController;
 @synthesize pausesBeforeSearching       = _pausesBeforeSearching;
-
+@synthesize pauseInterval               = _pauseInterval;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (id)initWithSearchBar:(UISearchBar*)searchBar contentsController:(UIViewController*)controller {
   if (self = [super initWithSearchBar:searchBar contentsController:controller]) {
+    _pauseInterval = kPauseInterval;
     self.delegate = self;
   }
 
@@ -59,7 +55,6 @@ static const NSTimeInterval kPauseInterval = 0.4;
   [super dealloc];
 }
 
->>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,25 +89,10 @@ static const NSTimeInterval kPauseInterval = 0.4;
 }
 
 
-<<<<<<< HEAD
-- (id)initWithSearchBar:(UISearchBar*)searchBar contentsController:(UIViewController*)controller {
-  if (self = [super initWithSearchBar:searchBar contentsController:controller]) {
-    _searchResultsDelegate2 = nil;
-    _searchResultsViewController = nil;
-    _pauseTimer = nil;
-    _pausesBeforeSearching = NO;
-	_pauseInterval = kPauseInterval;
-	  
-    self.delegate = self;
-  }
-  return self;
-}
-=======
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark -
 #pragma mark UISearchDisplayDelegate
->>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -213,16 +193,12 @@ static const NSTimeInterval kPauseInterval = 0.4;
   return NO;
 }
 
-<<<<<<< HEAD
-- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
-{
-	if (_pausesBeforeSearching) {
-		TT_INVALIDATE_TIMER(_pauseTimer);
-	}
-	[_searchResultsViewController.dataSource search:self.searchBar.text];
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
+  if (_pausesBeforeSearching) {
+    TT_INVALIDATE_TIMER(_pauseTimer);
+  }
+  [_searchResultsViewController.dataSource search:self.searchBar.text];
 }
-=======
->>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

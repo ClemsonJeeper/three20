@@ -46,55 +46,11 @@
 
   BOOL _editing;
   BOOL _springing;
-<<<<<<< HEAD
-}
-
-@property (nonatomic, retain) UIScrollView *scrollView;
-
-/**
- *
- */
-@property(nonatomic,assign) id<TTLauncherViewDelegate> delegate;
-
-/**
- *
- */
-@property(nonatomic,copy) NSArray* pages;
-
-/**
- *
- */
-@property(nonatomic) NSInteger columnCount;
-
-/**
- *
- */
-@property(nonatomic,readonly) NSInteger rowCount;
-
-/**
- *
- */
-@property(nonatomic) NSInteger currentPageIndex;
-
-/**
- *
- */
-@property(nonatomic,copy) NSString* prompt;
-
-/**
- *
- */
-@property(nonatomic,readonly) BOOL editing;
-
-/**
- *
- */
-- (void)addItem:(TTLauncherItem*)item animated:(BOOL)animated;
-=======
->>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
 
   id<TTLauncherViewDelegate> _delegate;
 }
+
+@property (nonatomic, retain) UIScrollView *scrollView;
 
 @property (nonatomic, assign) id<TTLauncherViewDelegate> delegate;
 
@@ -114,13 +70,11 @@
 
 - (void)removeItem:(TTLauncherItem*)item animated:(BOOL)animated;
 
-<<<<<<< HEAD
 - (BOOL)launcherView:(TTLauncherView*)launcher shouldRemoveItem:(TTLauncherItem*)item;
 
 - (void)launcherView:(TTLauncherView*)launcher didRemoveItem:(TTLauncherItem*)item;
-=======
+
 - (TTLauncherItem*)itemWithURL:(NSString*)URL;
->>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
 
 - (NSIndexPath*)indexPathOfItem:(TTLauncherItem*)item;
 

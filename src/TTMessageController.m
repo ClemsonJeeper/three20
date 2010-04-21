@@ -14,6 +14,8 @@
 // limitations under the License.
 //
 
+#import "Three20/TTButton.h"
+
 #import "Three20/TTMessageController.h"
 
 #import "Three20/TTMessageControllerDelegate.h"
@@ -21,6 +23,7 @@
 #import "Three20/TTMessageRecipientField.h"
 #import "Three20/TTMessageTextField.h"
 #import "Three20/TTMessageSubjectField.h"
+#import "Three20/TTMessageAttachmentField.h"
 #import "Three20/TTTextEditor.h"
 
 #import "Three20/TTGlobalCore.h"
@@ -101,19 +104,6 @@
 #pragma mark -
 #pragma mark Private
 
-<<<<<<< HEAD
-@implementation FRAttachmentField
-@synthesize uploading = _uploading;
-@end
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-@implementation TTMessageController
-
-@synthesize delegate = _delegate, dataSource = _dataSource, fields = _fields,
-            isModified = _isModified, showsRecipientPicker = _showsRecipientPicker;
-=======
->>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 - (void)cancel {
@@ -133,76 +123,51 @@
   _fieldViews = [[NSMutableArray alloc] init];
 
   for (TTMessageField* field in _fields) {
-<<<<<<< HEAD
-	  if ([field isKindOfClass:[FRAttachmentField class]]) {
-		  UIView *v = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 40)] autorelease];
-		  TTButton *button = [TTButton buttonWithStyle:@"smallEmbossedButton:" title:field.title];
-		  button.font = [UIFont systemFontOfSize:12];
-		  [button sizeToFit];
-		  button.origin = CGPointMake(5, 5);
-		  [button addTarget:self action:@selector(showAttachmentPicker) forControlEvents:UIControlEventTouchUpInside];
-		  
-		  [v addSubview:button];
+    if ([field isKindOfClass:[TTMessageAttachmentField class]]) {
+      UIView *v = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 40)] autorelease];
+      TTButton *button = [TTButton buttonWithStyle:@"smallEmbossedButton:" title:field.title];
+      button.font = [UIFont systemFontOfSize:12];
+      [button sizeToFit];
+      button.origin = CGPointMake(5, 5);
+      [button addTarget:self action:@selector(showAttachmentPicker) forControlEvents:UIControlEventTouchUpInside];
 
-		  UILabel* label = [[[UILabel alloc] init] autorelease];
-		  label.text = @"";
-		  label.tag = 600;
-		  label.font = [UIFont systemFontOfSize:12];
-		  label.textColor = TTSTYLEVAR(messageFieldTextColor);
-		  label.frame = CGRectMake(100, 10, 200, 20);
-
-		  [v addSubview:label];
-		  
-		  [_scrollView addSubview:v];
-		  [_fieldViews addObject:v];
-	  } else {
-		TTPickerTextField* textField = [field createViewForController:self];
-		if (textField) {
-		  textField.delegate = self;
-		  textField.backgroundColor = TTSTYLEVAR(backgroundColor);
-		  textField.font = TTSTYLEVAR(messageFont);
-		  textField.returnKeyType = UIReturnKeyNext;
-		  textField.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-		  [textField sizeToFit];
-		  
-		  UILabel* label = [[[UILabel alloc] init] autorelease];
-		  label.text = field.title;
-		  label.font = TTSTYLEVAR(messageFont);
-		  label.textColor = TTSTYLEVAR(messageFieldTextColor);
-		  [label sizeToFit];
-		  label.frame = CGRectInset(label.frame, -2, 0);
-		  textField.leftView = label;
-		  textField.leftViewMode = UITextFieldViewModeAlways;
-
-		  [_scrollView addSubview:textField];
-		  [_fieldViews addObject:textField];
-		}
-	  }
-	  UIView* separator = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 1)] autorelease];
-=======
-    TTPickerTextField* textField = [field createViewForController:self];
-    if (textField) {
-      textField.delegate = self;
-      textField.backgroundColor = TTSTYLEVAR(backgroundColor);
-      textField.font = TTSTYLEVAR(messageFont);
-      textField.returnKeyType = UIReturnKeyNext;
-      textField.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-      [textField sizeToFit];
+      [v addSubview:button];
 
       UILabel* label = [[[UILabel alloc] init] autorelease];
-      label.text = field.title;
-      label.font = TTSTYLEVAR(messageFont);
+      label.text = @"";
+      label.tag = 600;
+      label.font = [UIFont systemFontOfSize:12];
       label.textColor = TTSTYLEVAR(messageFieldTextColor);
-      [label sizeToFit];
-      label.frame = CGRectInset(label.frame, -2, 0);
-      textField.leftView = label;
-      textField.leftViewMode = UITextFieldViewModeAlways;
+      label.frame = CGRectMake(100, 10, 200, 20);
 
-      [_scrollView addSubview:textField];
-      [_fieldViews addObject:textField];
+      [v addSubview:label];
 
+      [_scrollView addSubview:v];
+      [_fieldViews addObject:v];
+    } else {
+      TTPickerTextField* textField = [field createViewForController:self];
+      if (textField) {
+        textField.delegate = self;
+        textField.backgroundColor = TTSTYLEVAR(backgroundColor);
+        textField.font = TTSTYLEVAR(messageFont);
+        textField.returnKeyType = UIReturnKeyNext;
+        textField.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        [textField sizeToFit];
+
+        UILabel* label = [[[UILabel alloc] init] autorelease];
+        label.text = field.title;
+        label.font = TTSTYLEVAR(messageFont);
+        label.textColor = TTSTYLEVAR(messageFieldTextColor);
+        [label sizeToFit];
+        label.frame = CGRectInset(label.frame, -2, 0);
+        textField.leftView = label;
+        textField.leftViewMode = UITextFieldViewModeAlways;
+
+        [_scrollView addSubview:textField];
+        [_fieldViews addObject:textField];
+        }
+      }
       UIView* separator = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 1)] autorelease];
->>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
       separator.backgroundColor = TTSTYLEVAR(messageFieldSeparatorColor);
       separator.autoresizingMask = UIViewAutoresizingFlexibleWidth;
       [_scrollView addSubview:separator];
@@ -257,8 +222,8 @@
   for (int i = 0; i < _fields.count; ++i) {
     TTMessageField* field = [_fields objectAtIndex:i];
     if (field.required) {
-		if ([field isKindOfClass:[FRAttachmentField class]]) {
-			FRAttachmentField *af = (FRAttachmentField *)field;
+		if ([field isKindOfClass:[TTMessageAttachmentField class]]) {
+			TTMessageAttachmentField *af = (TTMessageAttachmentField *)field;
 			compliant = ![af uploading];
 		} else if ([field isKindOfClass:[TTMessageRecipientField class]]) {
         TTPickerTextField* textField = [_fieldViews objectAtIndex:i];
@@ -345,25 +310,12 @@
   }
 }
 
-<<<<<<< HEAD
-- (void)showAttachmentPicker
-{
-	if ([_delegate respondsToSelector:@selector(composeControllerShowAttachmentPicker:)]) {
-		[_delegate composeControllerShowAttachmentPicker:self];
-	}
-}	
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// NSObject
-
-- (id)initWithRecipients:(NSArray*)recipients {
-  if (self = [self init]) {
-    _initialRecipients = [recipients retain];
+- (void)showAttachmentPicker {
+  if ([_delegate respondsToSelector:@selector(composeControllerShowAttachmentPicker:)]) {
+    [_delegate composeControllerShowAttachmentPicker:self];
   }
-  return self;
 }
-=======
->>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -729,7 +681,7 @@
     if ([field isKindOfClass:[TTMessageRecipientField class]]) {
       TTPickerTextField* pickerTextField = [_fieldViews objectAtIndex:fieldIndex];
       return !pickerTextField.text.isEmptyOrWhitespace || pickerTextField.cellViews.count > 0;
-    } else if ([field isKindOfClass:[FRAttachmentField class]]) {
+    } else if ([field isKindOfClass:[TTMessageAttachmentField class]]) {
 		return YES;
 	} else {
       UITextField* textField = [_fieldViews objectAtIndex:fieldIndex];
@@ -750,15 +702,12 @@
   }
 }
 
-<<<<<<< HEAD
 - (TTMessageField *)fieldForFieldAtIndex:(NSUInteger)fieldIndex {
-	return [_fields objectAtIndex:fieldIndex];
+  return [_fields objectAtIndex:fieldIndex];
 }
 
-=======
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
->>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
 - (void)send {
   NSMutableArray* fields = [[_fields mutableCopy] autorelease];
   for (int i = 0; i < fields.count; ++i) {

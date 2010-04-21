@@ -29,38 +29,6 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-<<<<<<< HEAD
-// private
-
-- (void)resizeForKeyboard:(NSNotification*)notification appearing:(BOOL)appearing {
-  NSValue* v1 = [notification.userInfo objectForKey:UIKeyboardBoundsUserInfoKey];
-  CGRect keyboardBounds;
-  [v1 getValue:&keyboardBounds];
-
-  NSValue* v2 = [notification.userInfo objectForKey:UIKeyboardCenterBeginUserInfoKey];
-  CGPoint keyboardStart;
-  [v2 getValue:&keyboardStart];
-
-  NSValue* v3 = [notification.userInfo objectForKey:UIKeyboardCenterEndUserInfoKey];
-  CGPoint keyboardEnd;
-  [v3 getValue:&keyboardEnd];
-
-  BOOL animated = keyboardStart.y != keyboardEnd.y;
-  if (animated) {
-    [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:TT_TRANSITION_DURATION];
-  }
-  
-	if (self.tabBarItem) {
-		keyboardBounds.size.height -= 50;
-	}
-	
-  if (appearing) {
-    [self keyboardWillAppear:animated withBounds:keyboardBounds];
-  } else {
-    [self keyboardDidDisappear:animated withBounds:keyboardBounds];
-  }
-=======
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 @implementation TTViewController
@@ -71,7 +39,6 @@
 @synthesize isViewAppearing         = _isViewAppearing;
 @synthesize hasViewAppeared         = _hasViewAppeared;
 @synthesize autoresizesForKeyboard  = _autoresizesForKeyboard;
->>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,6 +102,10 @@
   if (animated) {
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:TT_TRANSITION_DURATION];
+  }
+
+  if (self.tabBarItem) {
+    keyboardBounds.size.height -= 50;
   }
 
   if (appearing) {

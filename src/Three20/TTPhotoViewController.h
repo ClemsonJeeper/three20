@@ -27,7 +27,8 @@
 @interface TTPhotoViewController : TTModelViewController <
   TTScrollViewDelegate,
   TTScrollViewDataSource,
-  TTThumbsViewControllerDelegate
+  TTThumbsViewControllerDelegate,
+  UIActionSheetDelegate
 > {
   id<TTPhoto>       _centerPhoto;
   NSInteger         _centerPhotoIndex;
@@ -39,6 +40,7 @@
   UIToolbar*        _toolbar;
   UIBarButtonItem*  _nextButton;
   UIBarButtonItem*  _previousButton;
+  UIBarButtonItem*  _actionButton;
 
   TTStyle*          _captionStyle;
 
@@ -51,24 +53,6 @@
 
   BOOL              _delayLoad;
 
-<<<<<<< HEAD
-@interface TTPhotoViewController : TTModelViewController
-          <TTScrollViewDelegate, TTScrollViewDataSource, TTThumbsViewControllerDelegate, UIActionSheetDelegate> {
-  id<TTPhotoSource> _photoSource;
-  id<TTPhoto> _centerPhoto;
-  NSInteger _centerPhotoIndex;
-  UIView* _innerView;
-  TTScrollView* _scrollView;
-  TTPhotoView* _photoStatusView;
-  UIToolbar* _toolbar;
-  UIBarButtonItem* _nextButton;
-  UIBarButtonItem* _previousButton;
-  UIBarButtonItem* _actionButton;
-  TTStyle* _captionStyle;
-  UIImage* _defaultImage;
-  NSString* _statusText;
-=======
->>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
   TTThumbsViewController* _thumbsController;
 
   id<TTPhotoSource> _photoSource;

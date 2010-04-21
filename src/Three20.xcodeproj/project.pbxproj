@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		566A4D3D117F895700658FF7 /* TTMessageAttachmentField.h in Headers */ = {isa = PBXBuildFile; fileRef = 566A4D3C117F895700658FF7 /* TTMessageAttachmentField.h */; };
+		566A4D3F117F895F00658FF7 /* TTMessageAttachmentField.m in Sources */ = {isa = PBXBuildFile; fileRef = 566A4D3E117F895F00658FF7 /* TTMessageAttachmentField.m */; };
 		6E14D7E810E09A2300445222 /* TTURLDataResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E14D7E610E09A2300445222 /* TTURLDataResponse.m */; };
 		6E14D81410E0A12700445222 /* TTURLImageResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E14D81210E0A12700445222 /* TTURLImageResponse.m */; };
 		6E14D82A10E0A16700445222 /* TTURLImageResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 6E14D82810E0A16700445222 /* TTURLImageResponse.h */; };
@@ -399,6 +401,8 @@
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		566A4D3C117F895700658FF7 /* TTMessageAttachmentField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TTMessageAttachmentField.h; path = Three20/TTMessageAttachmentField.h; sourceTree = SOURCE_ROOT; };
+		566A4D3E117F895F00658FF7 /* TTMessageAttachmentField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTMessageAttachmentField.m; sourceTree = SOURCE_ROOT; };
 		6E14D7E610E09A2300445222 /* TTURLDataResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTURLDataResponse.m; sourceTree = "<group>"; };
 		6E14D81210E0A12700445222 /* TTURLImageResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTURLImageResponse.m; sourceTree = "<group>"; };
 		6E14D82810E0A16700445222 /* TTURLImageResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TTURLImageResponse.h; path = Three20/TTURLImageResponse.h; sourceTree = "<group>"; };
@@ -965,6 +969,8 @@
 		6E94C7D4116DA1660012B12C /* Message Fields */ = {
 			isa = PBXGroup;
 			children = (
+				566A4D3C117F895700658FF7 /* TTMessageAttachmentField.h */,
+				566A4D3E117F895F00658FF7 /* TTMessageAttachmentField.m */,
 				6E94C7D9116DA19A0012B12C /* TTMessageField.h */,
 				6E94C7D6116DA1810012B12C /* TTMessageField.m */,
 				6E94C80B116DA3920012B12C /* TTMessageRecipientField.h */,
@@ -1823,6 +1829,7 @@
 				6E62080C11766EA900035C6C /* TTThumbsTableViewCellDelegate.h in Headers */,
 				6E6208331176702000035C6C /* TTLauncherViewDelegate.h in Headers */,
 				6E6208441176709500035C6C /* TTLauncherScrollView.h in Headers */,
+				566A4D3D117F895700658FF7 /* TTMessageAttachmentField.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2080,6 +2087,7 @@
 				6E6206CD11764B6100035C6C /* TTTableFlushViewCell.m in Sources */,
 				6E6207A911766A0300035C6C /* TTThumbsDataSource.m in Sources */,
 				6E6208421176708600035C6C /* TTLauncherScrollView.m in Sources */,
+				566A4D3F117F895F00658FF7 /* TTMessageAttachmentField.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

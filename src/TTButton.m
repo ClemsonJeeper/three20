@@ -366,17 +366,14 @@ static const CGFloat kVPadding = 7;
   [self setNeedsDisplay];
 }
 
-<<<<<<< HEAD
 - (void)setRawImage:(UIImage*)image forState:(UIControlState)state {
-	TTButtonContent *content = [self contentForState:state];
-	content.image = image;
-	[self setNeedsDisplay];
+  TTButtonContent *content = [self contentForState:state];
+  content.image = image;
+  [self setNeedsDisplay];
 }
 
-=======
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
->>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
 - (TTStyle*)styleForState:(UIControlState)state {
   return [self contentForState:state].style;
 }

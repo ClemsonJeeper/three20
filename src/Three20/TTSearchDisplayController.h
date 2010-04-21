@@ -35,22 +35,13 @@ extern const int kTTSearchBarBackgroundTag;
   NSTimer*                _pauseTimer;
   BOOL                    _pausesBeforeSearching;
 
-  id<UITableViewDelegate> _searchResultsDelegate2;
-<<<<<<< HEAD
-  TTTableViewController* _searchResultsViewController;
-  NSTimer* _pauseTimer;
-  BOOL _pausesBeforeSearching;
-	float _pauseInterval;
-}
+  float                   _pauseInterval;
 
-@property(nonatomic,retain) TTTableViewController* searchResultsViewController;
-@property(nonatomic) BOOL pausesBeforeSearching;
-@property(nonatomic) float pauseInterval;
-=======
+  id<UITableViewDelegate> _searchResultsDelegate2;
 }
 
 @property (nonatomic, retain) TTTableViewController* searchResultsViewController;
 @property (nonatomic)         BOOL                   pausesBeforeSearching;
->>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
+@property (nonatomic)         float                  pauseInterval;
 
 @end

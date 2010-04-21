@@ -24,10 +24,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 @implementation TTLauncherItem
 
-<<<<<<< HEAD
-@synthesize launcher = _launcher, title = _title, image = _image, URL = _URL, style = _style,
-            badgeNumber = _badgeNumber, canDelete = _canDelete, rawImage = _rawImage, rawData = _rawData;
-=======
 @synthesize launcher    = _launcher;
 @synthesize title       = _title;
 @synthesize image       = _image;
@@ -35,7 +31,8 @@
 @synthesize style       = _style;
 @synthesize badgeNumber = _badgeNumber;
 @synthesize canDelete   = _canDelete;
->>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
+@synthesize rawImage    = _rawImage;
+@synthesize rawData     = _rawData;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,16 +51,6 @@
 - (id)initWithTitle:(NSString*)title image:(NSString*)image URL:(NSString*)URL
       canDelete:(BOOL)canDelete {
   if (self = [super init]) {
-<<<<<<< HEAD
-    _launcher = nil;
-    _title = nil;
-    _image = nil;
-    _rawImage = nil;
-    _URL = nil;
-    _style = nil;
-    _badgeNumber = 0;
-=======
->>>>>>> 06cd0abe33ac39d1f509e278e286c6bf1e45e821
     _canDelete = canDelete;
 
     self.title = title;
