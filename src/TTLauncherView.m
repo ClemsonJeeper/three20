@@ -61,6 +61,7 @@ static const NSInteger kDefaultColumnCount = 3;
 @implementation TTLauncherView
 
 @synthesize delegate = _delegate, columnCount = _columnCount, prompt = _prompt, editing = _editing;
+@synthesize scrollView = _scrollView;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // private

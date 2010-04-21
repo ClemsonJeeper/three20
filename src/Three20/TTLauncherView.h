@@ -40,6 +40,8 @@
   BOOL _springing;
 }
 
+@property (nonatomic, retain) UIScrollView *scrollView;
+
 /**
  *
  */

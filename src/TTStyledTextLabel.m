@@ -396,6 +396,7 @@ static const CGFloat kCancelHighlightThreshold = 4;
 }
 
 - (void)setHighlightedNode:(TTStyledElement*)node {
+	return;
   if (node != _highlightedNode) {
     if (!node) {
       [self setHighlightedFrame:nil];

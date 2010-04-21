@@ -265,6 +265,10 @@
   NSValue* value = [notification.userInfo objectForKey:UIKeyboardBoundsUserInfoKey];
   CGRect keyboardBounds;
   [value getValue:&keyboardBounds];
+	
+	if (self.tabBarItem) {
+		keyboardBounds.size.height -= 50;
+	}
 
   [self keyboardDidAppear:YES withBounds:keyboardBounds];
 }
@@ -280,6 +284,10 @@
   CGRect keyboardBounds;
   [value getValue:&keyboardBounds];
 
+	if (self.tabBarItem) {
+		keyboardBounds.size.height -= 50;
+	}
+	
   [self keyboardWillDisappear:YES withBounds:keyboardBounds];
 }
 
